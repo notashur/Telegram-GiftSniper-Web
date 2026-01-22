@@ -70,4 +70,4 @@ This project is provided for educational and research purposes only.
 The author is not responsible for misuse.
 
 ## 📜 License
-MIT
+[MIT License](LICENSE)
