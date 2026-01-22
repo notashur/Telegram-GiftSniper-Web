@@ -52,12 +52,37 @@ source venv/bin/activate
 venv\Scripts\activate
 ```
 ### 4️⃣ Install dependencies
+```bash
 pip install -r requirements.txt
-
+```
 ## ▶️ Running the Project
 ```bash
 ./run.sh
 ```
+
+## 🔐 Default Admin Login
+
+After starting the server, you can access the web panel using the default admin credentials:
+
+# Username: ashur  
+# Password: admin123  
+
+## 🔄 Changing Admin Credentials
+
+For security reasons, you should change the default credentials immediately.
+
+Admin users are stored in:
+
+data/users.json
+
+You can edit:
+- Username
+- Password
+- Admin flags / permissions
+
+Then restart the server for changes to take effect.
+
+⚠️ Never expose the default credentials on a public server.
 
 ## 🖼️ Gift Images & Auto Update
 - Gift images are downloaded only once
