@@ -64,8 +64,8 @@ pip install -r requirements.txt
 
 After starting the server, you can access the web panel using the default admin credentials:
 
-# Username: ashur  
-# Password: admin123  
+Username: ashur  
+Password: admin123  
 
 ## 🔄 Changing Admin Credentials
 
