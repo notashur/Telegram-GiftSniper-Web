@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+set -e
+
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+DATA_DIR="$BASE_DIR/data"
+STATIC_DIR="$BASE_DIR/static"
+GIFTS_JSON="$DATA_DIR/gifts.json"
+HASH_FILE="$STATIC_DIR/.gifts_hash"
+
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+echo "[*] Starting GiftSniper PRO..."
+
+# ---- Step 1: Check gifts.json ----
+if [ ! -f "$GIFTS_JSON" ]; then
+    echo "[!] gifts.json not found. It will be fetched automatically."
+    NEED_UPDATE=1
+else
+    NEED_UPDATE=0
+fi
+
+# ---- Step 2: Compute current hash ----
+if [ -f "$GIFTS_JSON" ]; then
+    CURRENT_HASH="$($PYTHON_BIN - <<EOF
+import hashlib
+with open("$GIFTS_JSON","rb") as f:
+    print(hashlib.sha256(f.read()).hexdigest())
+EOF
+)"
+else
+    CURRENT_HASH=""
+fi
+
+# ---- Step 3: Compare hash ----
+if [ -f "$HASH_FILE" ]; then
+    SAVED_HASH="$(cat "$HASH_FILE")"
+else
+    SAVED_HASH=""
+fi
+
+if [ "$CURRENT_HASH" != "$SAVED_HASH" ]; then
+    NEED_UPDATE=1
+fi
+
+# ---- Step 4: Download static gift images if needed ----
+if [ "$NEED_UPDATE" -eq 1 ]; then
+    echo "[*] Updating gift static images..."
+    $PYTHON_BIN "$DATA_DIR/update_static_icons.py"
+
+    echo "$CURRENT_HASH" > "$HASH_FILE"
+    echo "[✓] Gift images updated."
+else
+    echo "[✓] Gift images already up to date."
+fi
+
+# ---- Step 5: Start server ----
+echo "[*] Starting Gunicorn..."
+# exec gunicorn --chdir "$BASE_DIR" -b 0.0.0.0:5913 app:app
+
+# if [ -z "$VIRTUAL_ENV" ]; then
+#     echo "Not inside a virtual environment. Activating now..."
+#     source venv/bin/activate
+# fi
+
+#javascript-obfuscator static/_js/ --output static/js/

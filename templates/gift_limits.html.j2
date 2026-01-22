@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gift Star Limits - Gift Sniper</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+            /* Existing styles remain the same */
+            .notification-container {
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                width: 320px;
+                max-width: 90%;
+                z-index: 1000;
+            }
+
+            .notification {
+                position: relative;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 0.375rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                display: flex;
+                align-items: center;
+                animation: slideIn 0.3s ease-out forwards;
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            .notification.success {
+                background-color: #10B981;
+                color: white;
+            }
+
+            .notification.error {
+                background-color: #EF4444;
+                color: white;
+            }
+
+            .notification.warning {
+                background-color: #F59E0B;
+                color: white;
+            }
+
+            .notification.info {
+                background-color: #3B82F6;
+                color: white;
+            }
+
+            .notification-icon {
+                margin-right: 0.75rem;
+                font-size: 1.25rem;
+            }
+
+            .notification-close {
+                margin-left: auto;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+
+            .notification-close:hover {
+                opacity: 1;
+            }
+
+            @keyframes slideIn {
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+
+            .dark-mode {
+                background-color: #1a202c;
+                color: #e2e8f0;
+            }
+
+            .dark-mode .bg-white {
+                background-color: #2d3748;
+            }
+
+            .dark-mode .text-gray-800 {
+                color: #e2e8f0;
+            }
+
+            .dark-mode .bg-gray-50 {
+                background-color: #4a5568;
+            }
+
+            .dark-mode .text-gray-700 {
+                color: #cbd5e0;
+            }
+
+            .dark-mode .border {
+                border-color: #4a5568;
+            }
+
+            .dark-mode input,
+            .dark-mode select {
+                background-color: #2d3748;
+                color: #e2e8f0;
+                border-color: #4a5568;
+            }
+
+            .dark-mode .bg-blue-500:hover {
+                background-color: #3182ce;
+            }
+
+            .dark-mode .bg-green-500:hover {
+                background-color: #38a169;
+            }
+
+            .dark-mode .bg-purple-500:hover {
+                background-color: #805ad5;
+            }
+
+            .dark-mode .bg-red-500:hover {
+                background-color: #e53e3e;
+            }
+
+            .section-card {
+                transition: transform 0.2s, box-shadow 0.2s;
+                border-radius: 0.75rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .section-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            }
+
+            .section-title {
+                position: relative;
+                padding-bottom: 0.75rem;
+                margin-bottom: 1.5rem;
+                font-size: 1.25rem;
+                font-weight: 600;
+            }
+
+            .section-title:after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 50px;
+                height: 3px;
+                background: linear-gradient(90deg, #4f46e5, #10b981);
+                border-radius: 3px;
+            }
+
+            .form-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+                color: #cbd5e0;
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 0.625rem;
+                border-radius: 0.375rem;
+                background-color: #2d3748;
+                border: 1px solid #4a5568;
+                color: #e2e8f0;
+                transition: border-color 0.2s;
+            }
+
+            .form-input:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            }
+
+            .save-btn {
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }
+
+            .back-btn {
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }
+
+            .gift-item {
+                display: flex;
+                align-items: center;
+                padding: 0.75rem;
+                border-radius: 0.5rem;
+                background-color: rgba(74, 85, 104, 0.5);
+                margin-bottom: 0.75rem;
+                transition: background-color 0.2s;
+            }
+
+            .gift-item:hover {
+                background-color: rgba(74, 85, 104, 0.7);
+            }
+
+            .gift-image {
+                width: 40px;
+                height: 40px;
+                object-fit: contain;
+                margin-right: 1rem;
+                border-radius: 0.25rem;
+            }
+
+            .gift-name {
+                flex-grow: 1;
+                font-weight: 500;
+            }
+
+            .star-input {
+                width: 80px;
+                text-align: center;
+                padding: 0.5rem;
+                border-radius: 0.375rem;
+                background-color: #2d3748;
+                border: 1px solid #4a5568;
+                color: #e2e8f0;
+            }
+
+            .star-input:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            }
+
+            .search-input {
+                width: 100%;
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+                border-radius: 0.375rem;
+                background-color: #2d3748;
+                border: 1px solid #4a5568;
+                color: #e2e8f0;
+            }
+
+            .search-input:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            }
+
+            input[type="number"]::-webkit-outer-spin-button,
+            input[type="number"]::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            input[type="number"] {
+                appearance: textfield;
+                -moz-appearance: textfield;
+            }
+
+            /* New styles for bulk edit features */
+            .bulk-edit-panel {
+                background-color: rgba(74, 85, 104, 0.7);
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-bottom: 1.5rem;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .bulk-edit-btn {
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .bulk-edit-btn.apply {
+                background-color: #4f46e5;
+                color: white;
+            }
+
+            .bulk-edit-btn.apply:hover {
+                background-color: #4338ca;
+            }
+
+            .bulk-edit-btn.reset {
+                background-color: #6b7280;
+                color: white;
+            }
+
+            .bulk-edit-btn.reset:hover {
+                background-color: #4b5563;
+            }
+
+            .bulk-edit-btn.select {
+                background-color: #10b981;
+                color: white;
+            }
+
+            .bulk-edit-btn.select:hover {
+                background-color: #0d9c6e;
+            }
+
+            .bulk-edit-btn.deselect {
+                background-color: #ef4444;
+                color: white;
+            }
+
+            .bulk-edit-btn.deselect:hover {
+                background-color: #dc2626;
+            }
+
+            .checkbox-container {
+                display: flex;
+                align-items: center;
+                margin-right: 1rem;
+            }
+
+            .gift-checkbox {
+                width: 18px;
+                height: 18px;
+                margin-right: 0.5rem;
+                cursor: pointer;
+            }
+
+            .filter-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .filter-item {
+                display: flex;
+                align-items: center;
+                background-color: rgba(74, 85, 104, 0.5);
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            .filter-item:hover {
+                background-color: rgba(74, 85, 104, 0.7);
+            }
+
+            .filter-item.active {
+                background-color: #4f46e5;
+            }
+
+            .disabled-gift {
+                opacity: 0.6;
+                background-color: rgba(239, 68, 68, 0.2);
+                border-left: 3px solid #EF4444;
+            }
+
+            .disabled-gift .star-input {
+                background-color: rgba(239, 68, 68, 0.3);
+            }
+
+            .sort-container {
+                display: flex;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+
+            .sort-label {
+                margin-right: 0.5rem;
+                font-weight: 500;
+            }
+
+            .sort-select {
+                padding: 0.5rem;
+                border-radius: 0.375rem;
+                background-color: #2d3748;
+                border: 1px solid #4a5568;
+                color: #e2e8f0;
+                cursor: pointer;
+            }
+
+            .gift-item.selected {
+                background-color: rgba(79, 70, 229, 0.3);
+                border: 1px solid #4f46e5;
+            }
+
+            .gift-counter {
+                background-color: #4f46e5;
+                color: white;
+                padding: 0.25rem 0.5rem;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                margin-left: 0.5rem;
+            }
+
+            .image-container {
+                position: relative;
+                width: 40px;
+                height: 40px;
+                margin-right: 1rem;
+            }
+
+            .image-placeholder {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: rgba(255, 255, 255, 0.05);
+                border-radius: 0.25rem;
+            }
+
+            .gift-image {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                border-radius: 0.25rem;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .gift-image.loaded {
+                opacity: 1;
+            }
+
+            .fa-spinner {
+                animation: spin 1s linear infinite;
+                color: #9CA3AF;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+
+    <body class="dark-mode bg-gray-900 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Header Section -->
+            <div id="unsaved-warning"
+                class="hidden bg-yellow-500 text-yellow-100 px-4 py-3 rounded-md flex items-center gap-3 shadow-lg mb-4">
+                <i class="fas fa-exclamation-triangle text-xl"></i>
+                <span class="text-sm font-medium">
+                    You have unsaved changes. Please save before navigating away!
+                </span>
+                <button onclick="this.parentElement.classList.add('hidden')" class="ml-auto focus:outline-none">
+                    <i class="fas fa-times text-yellow-200 hover:text-white"></i>
+                </button>
+            </div>
+            <div class="bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white mb-1">Gift Star Limits</h1>
+                        <p class="text-gray-400 text-sm">Set individual star limits for each gift</p>
+                    </div>
+
+                    <div>
+                        <a href="/settings" class="back-btn bg-blue-600 text-white hover:bg-blue-700 flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" class="space-y-8">
+                <!-- Gift Star Limits Section -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card">
+                    <h2 class="section-title text-gray-300">Individual Gift Limits</h2>
+
+                    <!-- Bulk Edit Panel -->
+                    <div class="bulk-edit-panel" id="bulk-edit-panel" style="display: none;">
+                        <div class="flex items-center">
+                            <span id="selected-count" class="font-medium">0</span>
+                            <span class="ml-1">gifts selected</span>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="number" id="bulk-star-value" class="star-input" min="0" step="1"
+                                placeholder="⭐ value">
+                            <button type="button" class="bulk-edit-btn apply ml-2" id="apply-bulk-value">
+                                <i class="fas fa-check-circle mr-1"></i>Apply
+                            </button>
+                        </div>
+                        <div class="flex items-center">
+                            <button type="button" class="bulk-edit-btn select" id="select-all">
+                                <i class="fas fa-check-square mr-1"></i>Select All
+                            </button>
+                            <button type="button" class="bulk-edit-btn deselect ml-2" id="deselect-all">
+                                <i class="fas fa-times-circle mr-1"></i>Deselect All
+                            </button>
+                        </div>
+                        <button type="button" class="bulk-edit-btn reset ml-auto" id="reset-bulk-edit">
+                            <i class="fas fa-undo mr-1"></i>Reset
+                        </button>
+                    </div>
+
+                    <!-- Filter and Sort Controls -->
+                    <div class="filter-container">
+                        <div class="filter-item active" data-filter="all">
+                            <i class="fas fa-list mr-2"></i>All Gifts
+                        </div>
+                        <div class="filter-item" data-filter="custom">
+                            <i class="fas fa-edit mr-2"></i>Custom Limits
+                        </div>
+                        <div class="filter-item" data-filter="default">
+                            <i class="fas fa-star mr-2"></i>Default Limit
+                        </div>
+                        <div class="filter-item" data-filter="disabled">
+                            <i class="fas fa-ban mr-2"></i>Disabled Gifts
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                        <!-- Search Box -->
+                        <input type="text" id="gift-search" class="search-input md:w-1/2" placeholder="Search gifts...">
+
+                        <!-- Sort Dropdown -->
+                        <div class="sort-container">
+                            <span class="sort-label">Sort by:</span>
+                            <select id="sort-gifts" class="sort-select">
+                                <option value="name-asc">Name (A-Z)</option>
+                                <option value="name-desc">Name (Z-A)</option>
+                                <option value="price-asc">Price (Low to High)</option>
+                                <option value="price-desc">Price (High to Low)</option>
+                                <option value="custom-first">Custom First</option>
+                                <option value="default-first">Default First</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3" id="gifts-container">
+                        {% for id, name in GIFT_MAPPINGS.items() %}
+                        <div class="gift-item {% if name in settings.GIFTS_NOT_TO_BUY %}disabled-gift{% endif %}"
+                            data-name="{{ name }}"
+                            data-price="{{ settings.GIFT_LIMITS.get(name, settings.DEFAULT_GIFTS_TO_BUY_MAX_PRICE) }}"
+                            {% if name in settings.GIFTS_NOT_TO_BUY %}data-disabled="true" {% endif %}>
+                            <div class="checkbox-container">
+                                <input type="checkbox" class="gift-checkbox" data-gift="{{ name }}" {% if name in
+                                    settings.GIFTS_NOT_TO_BUY %}disabled{% endif %}>
+                            </div>
+                            <div class="image-container">
+                                <div class="image-placeholder">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                                <img src="{{ url_for('serve_gift_image', filename=id ~ '.png') }}" alt="{{ name }}"
+                                    class="gift-image"
+                                    onload="this.classList.add('loaded'); this.previousElementSibling.style.display = 'none';"
+                                    onerror="this.src='data:image/svg+xml;charset=UTF-8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22currentColor%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><rect x=%220%22 y=%220%22 width=%2724%22 height=%2724%22 rx=%222%22 ry=%222%22></rect><line x1=%229%22 y1=%229%22 x2=%2215%22 y2=%2215%22></line><line x1=%2215%22 y1=%229%22 x2=%229%22 y2=%2215%22></line></svg>'; this.style.backgroundColor='rgba(156, 163, 175, 0.1)';">
+                            </div>
+                            <span class="gift-name">{{ name }}</span>
+                            <div class="relative">
+                                <input type="number" name="GIFT_LIMIT_{{ name }}"
+                                    value="{{ settings.GIFT_LIMITS.get(name, settings.DEFAULT_GIFTS_TO_BUY_MAX_PRICE) }}"
+                                    class="star-input" min="0" step="1" placeholder="⭐ limit" {% if name in
+                                    settings.GIFTS_NOT_TO_BUY %}disabled{% endif %}>
+                                <span
+                                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs">⭐</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="flex justify-center">
+                    <button type="submit" class="save-btn bg-green-600 text-white hover:bg-green-700 flex items-center">
+                        <i class="fas fa-save mr-2"></i>Save Limits
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Notification Container -->
+        <div id="notification-container" class="notification-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="notification {{ category }} mb-3">
+                <i class="notification-icon 
+                            {% if category == 'success' %}fas fa-check-circle
+                            {% elif category == 'error' %}fas fa-exclamation-circle
+                            {% elif category == 'warning' %}fas fa-exclamation-triangle
+                            {% else %}fas fa-info-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+                <span class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <script>
+                document.addEventListener("DOMContentLoaded", () => {
+        const form = document.querySelector("form");
+        const warningMessage = document.getElementById("unsaved-warning");
+        let isDirty = false;
+        let isSubmitting = false;
+
+        const markDirty = () => {
+            isDirty = true;
+            warningMessage.classList.remove("hidden");
+        };
+
+        // Listen to all input, textarea, select EXCEPT the sort select
+        form.querySelectorAll("input:not(.sort-select), textarea, select:not(#sort-gifts)").forEach(input => {
+            input.addEventListener("input", markDirty);
+            input.addEventListener("change", markDirty);
+        });
+
+        form.addEventListener("submit", () => {
+            isSubmitting = true;
+            warningMessage.classList.add("hidden");
+        });
+
+        window.addEventListener("beforeunload", (event) => {
+            if (isDirty && !isSubmitting) {
+                event.preventDefault();
+                event.returnValue = "";
+            }
+        });
+
+        // Initialize bulk edit functionality
+        initBulkEdit();
+        // Initialize filtering
+        initFiltering();
+        // Initialize sorting
+        initSorting();
+    });
+
+            function clearWarning() {
+                document.getElementById("unsaved-warning").classList.add("hidden");
+            }
+
+            function initBulkEdit() {
+                const bulkEditPanel = document.getElementById('bulk-edit-panel');
+                const checkboxes = document.querySelectorAll('.gift-checkbox');
+                const selectAllBtn = document.getElementById('select-all');
+                const deselectAllBtn = document.getElementById('deselect-all');
+                const applyBulkBtn = document.getElementById('apply-bulk-value');
+                const resetBulkBtn = document.getElementById('reset-bulk-edit');
+                const bulkStarInput = document.getElementById('bulk-star-value');
+                const selectedCount = document.getElementById('selected-count');
+
+                // Toggle bulk edit panel when any checkbox is checked
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function () {
+                        updateSelectedCount();
+                        const anyChecked = document.querySelector('.gift-checkbox:checked');
+                        bulkEditPanel.style.display = anyChecked ? 'flex' : 'none';
+
+                        // Toggle selected class on gift item
+                        const giftItem = this.closest('.gift-item');
+                        if (this.checked) {
+                            giftItem.classList.add('selected');
+                        } else {
+                            giftItem.classList.remove('selected');
+                        }
+                    });
+                });
+
+                // Select all gifts
+                selectAllBtn.addEventListener('click', function () {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = true;
+                        checkbox.dispatchEvent(new Event('change'));
+                    });
+                });
+
+                // Deselect all gifts
+                deselectAllBtn.addEventListener('click', function () {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                        checkbox.dispatchEvent(new Event('change'));
+                    });
+                });
+
+                // Apply bulk value to selected gifts
+                applyBulkBtn.addEventListener('click', function () {
+                    const value = parseInt(bulkStarInput.value);
+                    if (isNaN(value)) {
+                        showNotification('Please enter a valid star value', 'error');
+                        return;
+                    }
+
+                    document.querySelectorAll('.gift-checkbox:checked').forEach(checkbox => {
+                        const giftName = checkbox.dataset.gift;
+                        const starInput = document.querySelector(`input[name="GIFT_LIMIT_${giftName}"]`);
+                        if (starInput) {
+                            starInput.value = value;
+                            // Update the data-price attribute for filtering
+                            starInput.closest('.gift-item').dataset.price = value;
+                        }
+                    });
+
+                    showNotification(`Updated ${document.querySelectorAll('.gift-checkbox:checked').length} gifts to ${value}⭐`, 'success');
+                    markDirty();
+                });
+
+                // Reset bulk edit
+                resetBulkBtn.addEventListener('click', function () {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                        checkbox.dispatchEvent(new Event('change'));
+                    });
+                    bulkStarInput.value = '';
+                });
+
+                // Update selected count
+                function updateSelectedCount() {
+                    const count = document.querySelectorAll('.gift-checkbox:checked').length;
+                    selectedCount.textContent = count;
+                }
+            }
+
+             function initFiltering() {
+            const filterItems = document.querySelectorAll('.filter-item');
+            const defaultPrice = {{ settings.DEFAULT_GIFTS_TO_BUY_MAX_PRICE }};
+            const giftsNotToBuy = {{ settings.GIFTS_NOT_TO_BUY|tojson|safe }};
+
+            filterItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Update active filter
+                    filterItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filterType = this.dataset.filter;
+                    const giftItems = document.querySelectorAll('.gift-item');
+
+                    giftItems.forEach(item => {
+                        const isDisabled = item.dataset.disabled === 'true';
+                        const price = parseInt(item.dataset.price);
+                        let shouldShow = false;
+
+                        switch(filterType) {
+                            case 'custom':
+                                shouldShow = !isDisabled && price !== defaultPrice;
+                                break;
+                            case 'default':
+                                shouldShow = !isDisabled && price === defaultPrice;
+                                break;
+                            case 'disabled':
+                                shouldShow = isDisabled;
+                                break;
+                            case 'all':
+                            default:
+                                shouldShow = true;
+                        }
+
+                        item.style.display = shouldShow ? 'flex' : 'none';
+                    });
+                });
+            });
+
+            // Apply the filter on page load
+            document.querySelector('.filter-item.active').click();
+        }
+
+        // Update the initSorting function
+            function initSorting() {
+        const sortSelect = document.getElementById('sort-gifts');
+        const defaultPrice = {{ settings.DEFAULT_GIFTS_TO_BUY_MAX_PRICE }};
+
+        sortSelect.addEventListener('change', function() {
+            const sortType = this.value;
+            const container = document.getElementById('gifts-container');
+            const items = Array.from(document.querySelectorAll('.gift-item'));
+
+            items.sort((a, b) => {
+                const isDisabledA = a.dataset.disabled === 'true';
+                const isDisabledB = b.dataset.disabled === 'true';
+                
+                // Always keep disabled gifts together at the bottom
+                if (isDisabledA && !isDisabledB) return 1;
+                if (!isDisabledA && isDisabledB) return -1;
+                if (isDisabledA && isDisabledB) {
+                    return a.dataset.name.localeCompare(b.dataset.name);
+                }
+
+                const nameA = a.dataset.name.toLowerCase();
+                const nameB = b.dataset.name.toLowerCase();
+                const priceA = parseInt(a.dataset.price);
+                const priceB = parseInt(b.dataset.price);
+
+                switch(sortType) {
+                    case 'name-asc':
+                        return nameA.localeCompare(nameB);
+                    case 'name-desc':
+                        return nameB.localeCompare(nameA);
+                    case 'price-asc':
+                        return priceA - priceB;
+                    case 'price-desc':
+                        return priceB - priceA;
+                    case 'custom-first':
+                        const isCustomA = priceA !== defaultPrice;
+                        const isCustomB = priceB !== defaultPrice;
+                        if (isCustomA === isCustomB) return nameA.localeCompare(nameB);
+                        return isCustomA ? -1 : 1;
+                    case 'default-first':
+                        const isDefaultA = priceA === defaultPrice;
+                        const isDefaultB = priceB === defaultPrice;
+                        if (isDefaultA === isDefaultB) return nameA.localeCompare(nameB);
+                        return isDefaultA ? -1 : 1;
+                    default:
+                        return 0;
+                }
+            });
+
+            // Re-append sorted items
+            container.innerHTML = '';
+            items.forEach(item => container.appendChild(item));
+        });
+    }
+
+            // Search functionality
+            document.getElementById('gift-search').addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const giftItems = document.querySelectorAll('.gift-item');
+
+                giftItems.forEach(item => {
+                    const giftName = item.dataset.name.toLowerCase();
+                    if (giftName.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Notification handling
+            function showNotification(message, type = 'info', duration = 5000) {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+
+                const icons = {
+                    success: 'fas fa-check-circle',
+                    error: 'fas fa-exclamation-circle',
+                    warning: 'fas fa-exclamation-triangle',
+                    info: 'fas fa-info-circle'
+                };
+
+                notification.innerHTML = `
+            <i class="notification-icon ${icons[type] || icons.info}"></i>
+            <span>${message}</span>
+            <span class="notification-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </span>
+        `;
+
+                container.appendChild(notification);
+
+                if (duration > 0) {
+                    setTimeout(() => {
+                        notification.style.animation = 'fadeOut 0.3s ease-out forwards';
+                        setTimeout(() => notification.remove(), 300);
+                    }, duration);
+                }
+
+                return notification;
+            }
+
+            // Error handling for images
+            document.querySelectorAll('.gift-image').forEach(img => {
+                img.addEventListener('error', function () {
+                    if (!this.src.includes('data:image/svg+xml')) {
+                        this.src = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="15"></line><line x1="15" y1="9" x2="9" y2="15"></line></svg>';
+                        this.classList.add('loaded');
+                        const placeholder = this.previousElementSibling;
+                        placeholder.innerHTML = '<i class="fas fa-image text-gray-400"></i>';
+                        placeholder.style.display = 'flex';
+                    }
+                });
+            });
+        </script>
+    </body>
+
+</html>

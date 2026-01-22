@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Settings - Gift Sniper</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+            /* Notification System */
+            .notification-container {
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                width: 320px;
+                max-width: 90%;
+                z-index: 1000;
+            }
+
+            .notification {
+                position: relative;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 0.375rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                display: flex;
+                align-items: center;
+                animation: slideIn 0.3s ease-out forwards;
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            .notification.success {
+                background-color: #10B981;
+                color: white;
+            }
+
+            .notification.error {
+                background-color: #EF4444;
+                color: white;
+            }
+
+            .notification.warning {
+                background-color: #F59E0B;
+                color: white;
+            }
+
+            .notification.info {
+                background-color: #3B82F6;
+                color: white;
+            }
+
+            .notification-icon {
+                margin-right: 0.75rem;
+                font-size: 1.25rem;
+            }
+
+            .notification-close {
+                margin-left: auto;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+
+            .notification-close:hover {
+                opacity: 1;
+            }
+
+            @keyframes slideIn {
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+
+            .dark-mode {
+                background-color: #1a202c;
+                color: #e2e8f0;
+            }
+
+            .dark-mode .bg-white {
+                background-color: #2d3748;
+            }
+
+            .dark-mode .text-gray-800 {
+                color: #e2e8f0;
+            }
+
+            .dark-mode .bg-gray-50 {
+                background-color: #4a5568;
+            }
+
+            .dark-mode .text-gray-700 {
+                color: #cbd5e0;
+            }
+
+            .dark-mode .border {
+                border-color: #4a5568;
+            }
+
+            .dark-mode input,
+            .dark-mode select {
+                background-color: #2d3748;
+                color: #e2e8f0;
+                border-color: #4a5568;
+            }
+
+            .dark-mode .bg-blue-500:hover {
+                background-color: #3182ce;
+            }
+
+            .dark-mode .bg-green-500:hover {
+                background-color: #38a169;
+            }
+
+            .dark-mode .bg-purple-500:hover {
+                background-color: #805ad5;
+            }
+
+            .dark-mode .bg-red-500:hover {
+                background-color: #e53e3e;
+            }
+
+            .dark-mode .text-blue-700 {
+                color: #90cdf4;
+            }
+
+            .dark-mode .text-green-700 {
+                color: #9ae6b4;
+            }
+
+            .dark-mode .text-purple-800 {
+                color: #b794f4;
+            }
+
+            .dark-mode .text-green-800 {
+                color: #9ae6b4;
+            }
+
+            /* New enhancements */
+            .section-card {
+                transition: transform 0.2s, box-shadow 0.2s;
+                border-radius: 0.75rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .section-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            }
+
+            .section-title {
+                position: relative;
+                padding-bottom: 0.75rem;
+                margin-bottom: 1.5rem;
+                font-size: 1.25rem;
+                font-weight: 600;
+            }
+
+            .section-title:after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 50px;
+                height: 3px;
+                background: linear-gradient(90deg, #4f46e5, #10b981);
+                border-radius: 3px;
+            }
+
+            .form-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 500;
+                color: #cbd5e0;
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 0.625rem;
+                border-radius: 0.375rem;
+                background-color: #2d3748;
+                border: 1px solid #4a5568;
+                color: #e2e8f0;
+                transition: border-color 0.2s;
+            }
+
+            .form-input:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            }
+
+            .blur-input {
+                filter: blur(5px);
+                cursor: pointer;
+                transition: filter 0.3s ease-in-out;
+            }
+
+            .blur-input:focus {
+                filter: none;
+                cursor: text;
+            }
+
+            .login-btn {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }
+
+            .save-btn {
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }
+
+            .back-btn {
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }
+
+            /* Modal styles */
+            .modal-overlay {
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 50;
+            }
+
+            .modal-content {
+                background-color: #2d3748;
+                border-radius: 0.75rem;
+                width: 100%;
+                max-width: 28rem;
+                padding: 1.5rem;
+            }
+
+            .modal-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+            }
+
+            .modal-input {
+                width: 100%;
+                padding: 0.75rem;
+                margin-bottom: 1rem;
+                border-radius: 0.375rem;
+                background-color: #4a5568;
+                border: 1px solid #718096;
+                color: #e2e8f0;
+            }
+
+            .modal-btn {
+                width: 100%;
+                padding: 0.75rem;
+                border-radius: 0.375rem;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }
+
+            /* Scrollable lists */
+            .scrollable-list {
+                max-height: 200px;
+                overflow-y: auto;
+                scrollbar-width: thin;
+            }
+
+            .scrollable-list::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .scrollable-list::-webkit-scrollbar-thumb {
+                background-color: #4b5563;
+                border-radius: 3px;
+            }
+
+            /* Dark mode for Tom Select */
+            .dark-mode .ts-control {
+                background-color: #2d3748 !important;
+                color: #e2e8f0 !important;
+                border-color: #4a5568 !important;
+            }
+
+            .dark-mode .ts-control .item {
+                background-color: #4a5568 !important;
+                color: #e2e8f0 !important;
+                border: 1px solid #718096 !important;
+            }
+
+            .dark-mode .ts-control .item .remove {
+                color: #e2e8f0 !important;
+            }
+
+            .dark-mode .ts-control .item .remove:hover {
+                color: #f56565 !important;
+                background-color: transparent !important;
+            }
+
+            .dark-mode .ts-dropdown {
+                background-color: #2d3748 !important;
+                color: #e2e8f0 !important;
+                border: 1px solid #4a5568;
+            }
+
+            .dark-mode .ts-dropdown .option {
+                background-color: #2d3748 !important;
+                color: #e2e8f0 !important;
+            }
+
+            .dark-mode .ts-dropdown .option:hover,
+            .dark-mode .ts-dropdown .option.active {
+                background-color: #4a5568 !important;
+                color: #fbd38d !important;
+            }
+
+            .dark-mode .ts-dropdown input {
+                background-color: #2d3748 !important;
+                color: #e2e8f0 !important;
+                border: none;
+            }
+
+            .image-placeholder {
+                background-color: rgba(255, 255, 255, 0.1);
+                border-radius: 4px;
+                color: #9CA3AF;
+            }
+
+            .ts-dropdown .option img,
+            .ts-control .item img {
+                transition: opacity 0.3s ease;
+            }
+
+            .fa-spinner {
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Ensure dropdown appears above all other elements */
+            .ts-dropdown-content .option {
+                display: flex;
+                align-items: center;
+                padding: 8px 12px;
+            }
+
+            .ts-dropdown-content .option img {
+                width: 24px;
+                height: 24px;
+                object-fit: contain;
+                margin-right: 10px;
+                background: transparent;
+            }
+
+            .ts-dropdown-content .option:hover img,
+            .ts-dropdown-content .option.active img {
+                filter: brightness(1.2);
+            }
+
+            .ts-dropdown-content::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .ts-dropdown-content::-webkit-scrollbar-track {
+                background: #1f2937;
+                border-radius: 4px;
+            }
+
+            .ts-dropdown-content::-webkit-scrollbar-thumb {
+                background-color: #4b5563;
+                border-radius: 4px;
+                border: 2px solid #1f2937;
+            }
+
+            /* Also ensure the control has proper z-index */
+            .ts-control {
+                z-index: 1;
+            }
+
+            .ts-control .ts-remove {
+                display: none !important;
+            }
+
+            /* Style our custom remove button */
+            .ts-control .item .remove {
+                margin-left: 4px;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+
+            .ts-control .item .remove:hover {
+                opacity: 1;
+                color: #ef4444 !important;
+            }
+
+
+            /* Style images in selected items */
+            .ts-control .item img {
+                width: 20px;
+                height: 20px;
+                object-fit: contain;
+                margin-right: 6px;
+            }
+
+            input[type="number"]::-webkit-outer-spin-button,
+            input[type="number"]::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            input[type="number"] {
+                appearance: textfield;
+                -moz-appearance: textfield;
+            }
+        </style>
+        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/css/tom-select.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.0.0/dist/js/tom-select.complete.min.js"></script>
+    </head>
+
+    <body class="dark-mode bg-gray-900 min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Header Section -->
+            <div id="unsaved-warning"
+                class="hidden bg-yellow-500 text-yellow-100 px-4 py-3 rounded-md flex items-center gap-3 shadow-lg mb-4">
+                <i class="fas fa-exclamation-triangle text-xl"></i>
+                <span class="text-sm font-medium">
+                    You have unsaved changes. Please save before navigating away!
+                </span>
+                <button onclick="this.parentElement.classList.add('hidden')" class="ml-auto focus:outline-none">
+                    <i class="fas fa-times text-yellow-200 hover:text-white"></i>
+                </button>
+            </div>
+            <div class="bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white mb-1">Settings</h1>
+                        <p class="text-gray-400 text-sm">Configure your Gift Sniper preferences</p>
+                    </div>
+
+                    <div>
+                        <a href="/" class="back-btn bg-blue-600 text-white hover:bg-blue-700 flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" class="space-y-8">
+                <!-- General and Buying Settings -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- General Settings -->
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card">
+                        <h2 class="section-title text-gray-300">General Settings</h2>
+
+                        <div class="space-y-5">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="form-label">Gift Star Limits</label>
+                                        <p class="text-gray-400 text-xs mt-1">Set individual star limits for each gift
+                                        </p>
+                                    </div>
+                                    <a href="/settings/gift-limits"
+                                        class="login-btn bg-purple-600 text-white hover:bg-purple-700 flex items-center">
+                                        <i class="fas fa-cog mr-2"></i> Configure Limits
+                                    </a>
+                                </div>
+                                <div class="mt-2 p-3 bg-gray-700 rounded-md">
+                                    <p class="text-gray-300 text-sm">
+                                        {% if settings.GIFT_LIMITS %}
+                                        <span class="text-green-400"><i class="fas fa-check-circle mr-1"></i>
+                                            Custom limits set for {{ settings.GIFT_LIMITS|length }} gifts</span>
+                                        {% else %}
+                                        <br><span class="text-yellow-400"><i class="fas fa-exclamation-circle mr-1"></i>
+                                            No custom limits configured</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label">Scan Interval (seconds)</label>
+                                <input type="number" name="SLEEP_BETWEEN_CYCLES"
+                                    value="{{ settings.SLEEP_BETWEEN_CYCLES }}" class="form-input">
+                                <p class="text-gray-400 text-xs mt-1">Delay between market scans</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buying Settings -->
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card">
+                        <h2 class="section-title text-gray-300">Buying Settings</h2>
+
+                        <div class="space-y-5">
+                            <!-- Gifts to Avoid -->
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="form-label">Gifts to Avoid</label>
+                                    <div class="flex space-x-2">
+                                        <button type="button" onclick="selectAll('gifts-select')"
+                                            class="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-md text-gray-300 transition-colors">
+                                            Select All
+                                        </button>
+                                        <button type="button" onclick="deselectAll('gifts-select')"
+                                            class="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-md text-gray-300 transition-colors">
+                                            Remove All
+                                        </button>
+                                    </div>
+                                </div>
+                                <select name="GIFTS_NOT_TO_BUY" multiple class="w-full" id="gifts-select">
+                                    {% for id, name in GIFT_MAPPINGS.items() %}
+                                    <option value="{{ name }}"
+                                        data-img="{{ url_for('serve_gift_image', filename=id ~ '.png') }}" {% if name in
+                                        settings.GIFTS_NOT_TO_BUY %}selected{% endif %}>
+                                        {{ name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+
+                                <div class="flex justify-between mt-1">
+                                    <p class="text-gray-400 text-xs">These gifts will be skipped</p>
+                                    <p id="gifts-count" class="text-gray-400 text-xs">0 selected</p>
+                                </div>
+                            </div>
+
+                            <!-- Backdrops to Avoid -->
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="form-label">Backdrops to Avoid</label>
+                                    <div class="flex space-x-2">
+                                        <button type="button" onclick="selectAll('backdrops-select')"
+                                            class="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-md text-gray-300 transition-colors">
+                                            Select All
+                                        </button>
+                                        <button type="button" onclick="deselectAll('backdrops-select')"
+                                            class="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded-md text-gray-300 transition-colors">
+                                            Remove All
+                                        </button>
+                                    </div>
+                                </div>
+                                <select name="BACKDROPS_NOT_TO_BUY" multiple class="w-full" id="backdrops-select">
+                                    {% for name, color in BACKDROP_CENTER_COLORS %}
+                                    <option value="{{ name }}" data-color="{{ color }}" {% if name in
+                                        settings.BACKDROPS_NOT_TO_BUY %}selected{% endif %}>
+                                        {{ name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+
+                                <div class="flex justify-between mt-1">
+                                    <p class="text-gray-400 text-xs">These backdrops will be skipped</p>
+                                    <p id="backdrops-count" class="text-gray-400 text-xs">0 selected</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Telegram Settings -->
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card">
+                        <h2 class="section-title text-gray-300">Telegram Settings</h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="form-label">Admin User ID</label>
+                                <input type="text" name="ADMIN_RECIPIENT_USER"
+                                    value="{{ settings.ADMIN_RECIPIENT_USER }}" class="form-input">
+                                <p class="text-gray-400 text-xs mt-1">Your Telegram User @username / ID for
+                                    notifications and gift reception.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- App Credentials -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Main App -->
+                        <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card">
+                            <h2 class="section-title text-blue-400">Main App Credentials</h2>
+
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="form-label">API ID</label>
+                                    <input type="number" name="APP_API_ID" value="{{ settings.APP_API_ID }}"
+                                        class="form-input blur-input" onclick="removeBlur(this)">
+                                </div>
+
+                                <div>
+                                    <label class="form-label">API Hash</label>
+                                    <input type="text" name="APP_API_HASH" value="{{ settings.APP_API_HASH }}"
+                                        class="form-input blur-input" onclick="removeBlur(this)">
+                                </div>
+
+                                <div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="form-label">Phone Number</label>
+                                        <button type="button" onclick="initLogin('app')"
+                                            class="login-btn bg-indigo-600 text-white hover:bg-indigo-700"
+                                            data-api-id="{{ settings.APP_API_ID }}"
+                                            data-api-hash="{{ settings.APP_API_HASH }}">
+                                            <i class="fas fa-sign-in-alt mr-1"></i> {{ 'Re-login' if
+                                            settings.APP_PHONE_NUMBER
+                                            else 'Login' }}
+                                        </button>
+                                    </div>
+                                    <input type="hidden" name="APP_PHONE_NUMBER"
+                                        value="{{ settings.APP_PHONE_NUMBER }}">
+                                    <input type="text"
+                                        value="{{ settings.APP_PHONE_NUMBER[:3] + '***' + settings.APP_PHONE_NUMBER[-4:] if settings.APP_PHONE_NUMBER else '' }}"
+                                        id="app-phone-input" class="form-input mt-2 cursor-pointer"
+                                        data-full="{{ settings.APP_PHONE_NUMBER }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buyer App -->
+                        <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card">
+                            <h2 class="section-title text-green-400">Buyer App Credentials</h2>
+
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="form-label">API ID</label>
+                                    <input type="number" name="BUYER_API_ID" value="{{ settings.BUYER_API_ID }}"
+                                        class="form-input blur-input" onclick="removeBlur(this)">
+                                </div>
+
+                                <div>
+                                    <label class="form-label">API Hash</label>
+                                    <input type="text" name="BUYER_API_HASH" value="{{ settings.BUYER_API_HASH }}"
+                                        class="form-input blur-input" onclick="removeBlur(this)">
+                                </div>
+
+                                <div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="form-label">Phone Number</label>
+                                        <button type="button" onclick="initLogin('buyer')"
+                                            class="login-btn bg-indigo-600 text-white hover:bg-indigo-700"
+                                            data-api-id="{{ settings.BUYER_API_ID }}"
+                                            data-api-hash="{{ settings.BUYER_API_HASH }}">
+                                            <i class="fas fa-sign-in-alt mr-1"></i> {{ 'Re-login' if
+                                            settings.BUYER_PHONE_NUMBER
+                                            else 'Login' }}
+                                        </button>
+                                    </div>
+                                    <input type="hidden" name="BUYER_PHONE_NUMBER"
+                                        value="{{ settings.BUYER_PHONE_NUMBER }}">
+                                    <input type="text"
+                                        value="{{ settings.BUYER_PHONE_NUMBER[:3] + '***' + settings.BUYER_PHONE_NUMBER[-4:] if settings.BUYER_PHONE_NUMBER else '' }}"
+                                        id="buyer-phone-input" class="form-input mt-2 cursor-pointer"
+                                        data-full="{{ settings.BUYER_PHONE_NUMBER }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Save Button -->
+                <div class="flex justify-center">
+                    <button onclick="clearWarning()" type="submit"
+                        class="save-btn bg-green-600 text-white hover:bg-green-700 flex items-center">
+                        <i class="fas fa-save mr-2"></i>Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Login Modal -->
+        <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+                <h3 class="text-xl font-semibold text-white mb-4" id="modal-title">Login to Telegram</h3>
+
+                <div id="login-step-phone" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-300 mb-2">Phone Number</label>
+                        <input type="text" id="login-phone"
+                            class="w-full px-3 py-2 border rounded-md bg-gray-700 text-white" placeholder="1234567890">
+                    </div>
+                    <button onclick="sendCode()"
+                        class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Send Code
+                    </button>
+                </div>
+
+                <div id="login-step-code" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-gray-300 mb-2">Verification Code</label>
+                        <input type="text" id="login-code"
+                            class="w-full px-3 py-2 border rounded-md bg-gray-700 text-white" placeholder="12345">
+                    </div>
+                    <button onclick="submitCode()"
+                        class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Verify
+                    </button>
+                </div>
+
+                <div id="login-step-2fa" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-gray-300 mb-2">2FA Password</label>
+                        <input type="password" id="login-password"
+                            class="w-full px-3 py-2 border rounded-md bg-gray-700 text-white" placeholder="••••••">
+                    </div>
+                    <button onclick="submit2FA()"
+                        class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Authenticate
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="notification-container" class="notification-container"> {% with messages =
+            get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="notification {{ category }} mb-3">
+                <i class="notification-icon 
+                            {% if category == 'success' %}fas fa-check-circle
+                            {% elif category == 'error' %}fas fa-exclamation-circle
+                            {% elif category == 'warning' %}fas fa-exclamation-triangle
+                            {% else %}fas fa-info-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+                <span class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const form = document.querySelector("form");
+                const warningMessage = document.getElementById("unsaved-warning");
+                let isDirty = false;
+                let isSubmitting = false;
+
+                const markDirty = () => {
+                    isDirty = true;
+                    warningMessage.classList.remove("hidden");
+                };
+
+                // Listen to all input, textarea, select
+                form.querySelectorAll("input, select, textarea").forEach(input => {
+                    input.addEventListener("input", markDirty);
+                    input.addEventListener("change", markDirty);
+                });
+
+                form.addEventListener("submit", () => {
+                    isSubmitting = true;
+                    warningMessage.classList.add("hidden");
+                });
+
+                window.addEventListener("beforeunload", (event) => {
+                    if (isDirty && !isSubmitting) {
+                        event.preventDefault();
+                        event.returnValue = "";
+                    }
+                });
+            });
+
+            function clearWarning() {
+                document.getElementById("unsaved-warning").classList.add("hidden");
+            }
+        </script>
+        <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+
+    </body>
+
+</html>

@@ -1,0 +1,11 @@
+{
+  "ashur": {
+    "username": "ashur",
+    "password_hash": "admin123",
+    "expire_date": "2069-01-01",
+    "is_admin": true,
+    "is_owner": true,
+    "settings": null,
+    "active": true
+  }
+}

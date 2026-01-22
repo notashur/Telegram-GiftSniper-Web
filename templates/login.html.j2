@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – infragment</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background-color: #0f172a;
+        }
+
+        .dark-mode {
+            color: #e2e8f0;
+        }
+
+        .dark-mode .bg-white {
+            background-color: #2d3748;
+        }
+
+        .dark-mode .text-gray-800 {
+            color: #e2e8f0;
+        }
+
+        .dark-mode .bg-gray-50 {
+            background-color: #4a5568;
+        }
+
+        .dark-mode .text-gray-700 {
+            color: #cbd5e0;
+        }
+
+        .dark-mode .border {
+            border-color: #4a5568;
+        }
+
+        .dark-mode input,
+        .dark-mode select {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            border-color: #4a5568;
+        }
+
+        .dark-mode input:focus {
+            border-color: #4caf50;
+            box-shadow: 0 0 0 0.1rem rgba(76, 175, 80, 0.25);
+            outline: none;
+        }
+
+        .login-container {
+            backdrop-filter: blur(8px);
+            background-color: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 320px;
+            max-width: 90%;
+            z-index: 1000;
+        }
+
+        .notification {
+            position: relative;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        .notification.success {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .notification.warning {
+            background-color: #F59E0B;
+            color: white;
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: white;
+        }
+
+        .notification-icon {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .notification-close {
+            margin-left: auto;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .carousel {
+            position: relative;
+            height: 200px;
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .carousel-item {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .carousel-item.active {
+            opacity: 1;
+        }
+
+        .carousel-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .carousel-control {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 50%;
+            margin: 0 0.5rem;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            z-index: 10;
+        }
+
+        .carousel-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+        }
+
+        .carousel-indicator.active {
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body class="dark-mode">
+    <!-- Particles.js Background -->
+    <div id="particles-js"></div>
+
+    <div class="container mx-auto px-4 flex justify-center items-center" style="height: 100vh;">
+        <div class="w-full max-w-md">
+            <!-- Image Carousel -->
+            <div class="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active" style="background-image: url('{{ url_for('static', filename='images/dashboard_screenshot.png') }}');">
+                        <div class="carousel-caption">Real-time Analytics Dashboard - Monitor your key metrics at a glance</div>
+                    </div>
+                    <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='images/settings_screenshot.png') }}');">
+                        <div class="carousel-caption">Customizable Settings - Tailor the platform to your exact needs</div>
+                    </div>
+                    <div class="carousel-item" style="background-image: url('{{ url_for('static', filename='images/gift_limits_screenshot.png') }}');">
+                        <div class="carousel-caption">Smart Gift Limits - Intelligent controls to optimize your experience</div>
+                    </div>
+                </div>
+                <div class="carousel-controls">
+                    <button class="carousel-control prev" onclick="prevSlide()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-control next" onclick="nextSlide()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="carousel-indicators">
+                    <div class="carousel-indicator active" onclick="goToSlide(0)"></div>
+                    <div class="carousel-indicator" onclick="goToSlide(1)"></div>
+                    <div class="carousel-indicator" onclick="goToSlide(2)"></div>
+                </div>
+            </div>
+
+            <div class="login-container rounded-lg shadow-md p-8">
+                <div class="text-center mb-6">
+                    <h1 class="text-2xl font-bold text-white mb-2">👤 Sign In</h1>
+                    <p class="text-gray-400">Please enter your username and password</p>
+                </div>
+
+                <!-- Display Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mb-4">
+                    {% for category, message in messages %}
+                    <div class="notification {{ category }} mb-3">
+                        <i class="notification-icon 
+                    {% if category == 'success' %}fas fa-check-circle
+                    {% elif category == 'error' %}fas fa-exclamation-circle
+                    {% elif category == 'warning' %}fas fa-exclamation-triangle
+                    {% else %}fas fa-info-circle{% endif %}"></i>
+                        <span>{{ message }}</span>
+                        <span class="notification-close" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <form method="POST" class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter your username" required
+                            class="w-full px-4 py-2 rounded-md border focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white bg-gray-700">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password"
+                            required
+                            class="w-full px-4 py-2 rounded-md border focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white bg-gray-700">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <p class="text-gray-400">
+                        Want an account? <a href="https://t.me/BBBB4" class="text-green-500 hover:text-green-400 hover:underline" target="_blank">Contact us on Telegram</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="fixed bottom-4 right-4 text-gray-500 text-sm">
+        © 2025 infragment
+    </footer>
+
+    <script src='{{ url_for("static", filename="js/login.js") }}'> </script>
+</body>
+
+</html>

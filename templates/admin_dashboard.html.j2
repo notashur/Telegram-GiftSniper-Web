@@ -1,0 +1,977 @@
+<!-- templates/admin_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Dashboard - Gift Sniper</title>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+            /* Reuse the same styles from settings.html */
+            .dark-mode {
+                background-color: #1a202c;
+                color: #e2e8f0;
+            }
+
+            .section-card {
+                transition: transform 0.2s, box-shadow 0.2s;
+                border-radius: 0.75rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .section-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            }
+
+            .section-title {
+                position: relative;
+                padding-bottom: 0.75rem;
+                margin-bottom: 1.5rem;
+                font-size: 1.25rem;
+                font-weight: 600;
+            }
+
+            .section-title:after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 50px;
+                height: 3px;
+                background: linear-gradient(90deg, #4f46e5, #10b981);
+                border-radius: 3px;
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 0.625rem;
+                border-radius: 0.375rem;
+                background-color: #2d3748;
+                border: 1px solid #4a5568;
+                color: #e2e8f0;
+                transition: border-color 0.2s;
+            }
+
+            .back-btn {
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                transition: background-color 0.2s;
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.375rem;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+
+            .badge-success {
+                background-color: #10B981;
+                color: white;
+            }
+
+            .badge-warning {
+                background-color: #F59E0B;
+                color: white;
+            }
+
+            .badge-danger {
+                background-color: #EF4444;
+                color: white;
+            }
+
+            .badge-info {
+                background-color: #3B82F6;
+                color: white;
+            }
+
+            .badge-purple {
+                background-color: #8b5cf6;
+                /* Tailwind's purple-500 */
+                color: white;
+            }
+
+            .notification-container {
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                width: 320px;
+                max-width: 90%;
+                z-index: 1000;
+            }
+
+            .notification {
+                position: relative;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 0.375rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                display: flex;
+                align-items: center;
+                animation: slideIn 0.3s ease-out forwards;
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            .notification.success {
+                background-color: #10B981;
+                color: white;
+            }
+
+            .notification.error {
+                background-color: #EF4444;
+                color: white;
+            }
+
+            .notification.warning {
+                background-color: #F59E0B;
+                color: white;
+            }
+
+            .notification.info {
+                background-color: #3B82F6;
+                color: white;
+            }
+
+            .notification-icon {
+                margin-right: 0.75rem;
+                font-size: 1.25rem;
+            }
+
+            .notification-close {
+                margin-left: auto;
+                cursor: pointer;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+
+            .notification-close:hover {
+                opacity: 1;
+            }
+
+            @keyframes slideIn {
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes fadeOut {
+                to {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+
+            /* Custom scrollbar styles */
+            .table-container {
+                overflow: auto;
+            }
+
+            .table-container::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            .table-container::-webkit-scrollbar-track {
+                background: #374151;
+                /* bg-gray-700 */
+                border-radius: 3px;
+            }
+
+            .table-container::-webkit-scrollbar-thumb {
+                background-color: #6B7280;
+                /* bg-gray-500 */
+                border-radius: 3px;
+            }
+
+            .table-container::-webkit-scrollbar-thumb:hover {
+                background-color: #9CA3AF;
+                /* bg-gray-400 */
+            }
+
+            /* For Firefox */
+            .table-container {
+                scrollbar-width: thin;
+                scrollbar-color: #6B7280 #374151;
+            }
+
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: #374151;
+                /* bg-gray-700 */
+                border-radius: 3px;
+            }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background-color: #6B7280;
+                /* bg-gray-500 */
+                border-radius: 3px;
+            }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background-color: #9CA3AF;
+                /* bg-gray-400 */
+            }
+        </style>
+    </head>
+
+    <body class="dark-mode bg-gray-900 min-h-screen">
+        <div id="notification-container" class="notification-container"> {% with messages =
+            get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="notification {{ category }} mb-3">
+                <i class="notification-icon 
+                            {% if category == 'success' %}fas fa-check-circle
+                            {% elif category == 'error' %}fas fa-exclamation-circle
+                            {% elif category == 'warning' %}fas fa-exclamation-triangle
+                            {% else %}fas fa-info-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+                <span class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+        <div class="container mx-auto px-4 py-8">
+            <!-- Header Section -->
+            <div class="bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white mb-1">Admin Dashboard</h1>
+                        <p class="text-gray-400 text-sm">Manage all Gift Sniper users</p>
+                    </div>
+                    <div>
+                        <a href="/" class="back-btn bg-blue-600 text-white hover:bg-blue-700 flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- User Management Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- User List -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card custom-scrollbar">
+                    <h2 class="section-title text-gray-300">User Management</h2>
+
+                    <!-- Add table-container class here -->
+                    <div class="table-container">
+                        <table class="min-w-full divide-y divide-gray-700">
+                            <thead>
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Username</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Expires</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Status</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Bot Status</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Current Balance</th>
+                                    <th
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-700">
+                                {% for user in users %}
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap text-gray-300">
+                                        {{ user.username }}
+                                        {% if user.is_admin %}
+                                        <span class="badge badge-info ml-2">Admin</span>
+                                        {% endif %}
+                                        {% if user.is_owner %}
+                                        <span class="badge badge-purple ml-2">Owner</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-gray-300">
+                                        {{ user.expire_date }}
+                                        <div class="text-xs text-gray-400">{{ user.days_left }} days left</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        {% if user.active %}
+                                        {% if user.days_left > 7 %}
+                                        <span class="badge badge-success">Active</span>
+                                        {% elif user.days_left > 0 %}
+                                        <span class="badge badge-warning">Expiring</span>
+                                        {% else %}
+                                        <span class="badge badge-danger">Expired</span>
+                                        {% endif %}
+                                        {% else %}
+                                        <span class="badge bg-gray-600">Disabled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        {% if user.bot_running %}
+                                        <span class="badge badge-success">Running</span>
+                                        {% if user.can_disable_bot %}
+                                        <button onclick="stopUserBot('{{ user.username }}')"
+                                            class="ml-2 text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded">
+                                            Stop Bot
+                                        </button>
+                                        {% endif %}
+                                        {% else %}
+                                        <span class="badge bg-gray-600">Stopped</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="stat-value text-white">{{ user.current_balance_stars }}⭐</div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex space-x-2">
+                                            <!-- Edit button - show for editable users -->
+                                            {% if user_manager.can_edit_user(g.username, user.username) %}
+                                            <button
+                                                onclick="showEditModal('{{ user.username }}', '{{ user.expire_date }}', {% if user.is_admin %}true{% else %}false{% endif %}, {% if is_owner %}true{% else %}false{% endif %})"
+                                                class="text-blue-400 hover:text-blue-300" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            {% endif %}
+
+                                            {% if not user.is_owner %}
+                                            <!-- Admin promotion/demotion buttons (owner only) -->
+                                            {% if is_owner %}
+                                            {% if not user.is_admin %}
+                                            <button onclick="promoteAdmin('{{ user.username }}')"
+                                                class="text-purple-400 hover:text-purple-300" title="Make Admin">
+                                                <i class="fas fa-user-shield"></i>
+                                            </button>
+                                            {% else %}
+                                            <button onclick="demoteAdmin('{{ user.username }}')"
+                                                class="text-orange-400 hover:text-orange-300" title="Remove Admin">
+                                                <i class="fas fa-user-minus"></i>
+                                            </button>
+                                            {% endif %}
+                                            {% endif %}
+
+                                            <!-- Active toggle -->
+                                            {% if user_manager.can_edit_user(g.username, user.username) %}
+                                            <button
+                                                onclick="toggleUserActive('{{ user.username }}', {% if user.active %}false{% else %}true{% endif %})"
+                                                class="{% if user.active %}text-yellow-400 hover:text-yellow-300{% else %}text-green-400 hover:text-green-300{% endif %}"
+                                                title="{% if user.active %}Disable{% else %}Enable{% endif %}">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                            {% endif %}
+
+                                            <!-- Delete button -->
+                                            {% if user_manager.can_edit_user(g.username, user.username) and g.username
+                                            != user.username %}
+                                            <button onclick="confirmDelete('{{ user.username }}')"
+                                                class="text-red-400 hover:text-red-300" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Create User Form -->
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card">
+                    <h2 class="section-title text-gray-300">Create New User</h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 mb-2">Username</label>
+                            <input type="text" id="new-username" class="form-input" placeholder="Enter username">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">Password</label>
+                            <input type="password" id="new-password" class="form-input" placeholder="Enter password">
+                        </div>
+                        <div>
+                            <label class="block text-gray-300 mb-2">Subscription Length (days)</label>
+                            <input type="number" id="new-expiry-days" class="form-input" value="30" min="1" required>
+                        </div>
+                        {% if is_owner %}
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="new-is-admin" class="form-checkbox h-4 w-4 text-blue-600">
+                            <label for="new-is-admin" class="text-gray-300">Make Admin</label>
+                        </div>
+                        {% endif %}
+                        <button onclick="createUser()"
+                            class="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                            <i class="fas fa-user-plus mr-2"></i> Create User
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg section-card">
+                    <h2 class="section-title text-gray-300">Proxy Management</h2>
+
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-gray-300">Proxy Pool Status</h3>
+                            <button onclick="refreshProxyStats()" class="text-blue-400 hover:text-blue-300">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div id="proxy-stats" class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="bg-gray-700 p-3 rounded text-center">
+                                <div class="text-sm text-gray-400">Total</div>
+                                <div id="proxy-total" class="text-xl font-bold">0</div>
+                            </div>
+                            <div class="bg-gray-700 p-3 rounded text-center">
+                                <div class="text-sm text-gray-400">Available</div>
+                                <div id="proxy-available" class="text-xl font-bold text-green-400">0</div>
+                            </div>
+                            <div class="bg-gray-700 p-3 rounded text-center">
+                                <div class="text-sm text-gray-400">In Use</div>
+                                <div id="proxy-in-use" class="text-xl font-bold text-yellow-400">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-300 mb-2">Add New Proxy</label>
+                            <div class="grid grid-cols-4 gap-2">
+                                <input type="text" id="proxy-host" class="form-input col-span-2" placeholder="Host">
+                                <input type="number" id="proxy-port" class="form-input" placeholder="Port" min="1"
+                                    max="65535">
+                                <button onclick="addProxy()" class="bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    Add
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <input type="text" id="proxy-username" class="form-input"
+                                    placeholder="Username (optional)">
+                                <input type="password" id="proxy-password" class="form-input"
+                                    placeholder="Password (optional)">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-300 mb-2">Proxy List</label>
+                            <div class="bg-gray-700 rounded-lg p-3 max-h-64 overflow-y-auto custom-scrollbar">
+                                <table class="min-w-full divide-y divide-gray-600">
+                                    <thead>
+                                        <tr>
+                                            <th class="px-2 py-1 text-left text-xs text-gray-400">Host:Port</th>
+                                            <th class="px-2 py-1 text-left text-xs text-gray-400">Status</th>
+                                            <th class="px-2 py-1 text-left text-xs text-gray-400">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="proxy-list" class="divide-y divide-gray-600">
+                                        <!-- Proxies will be added here by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit User Modal -->
+        <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+                <h3 class="text-xl font-semibold text-white mb-4">Edit User</h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-300 mb-2">Username</label>
+                        <input type="text" id="edit-username" class="form-input" readonly>
+                    </div>
+
+                    <!-- Only show expiry date field for owner or when editing non-admin -->
+                    <div id="expiry-field-container">
+                        <label class="block text-gray-300 mb-2">New Expiry Date</label>
+                        <input type="date" id="edit-expiry" class="form-input">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-300 mb-2">New Password (leave blank to keep current)</label>
+                        <input type="password" id="edit-password" class="form-input" placeholder="Enter new password">
+                    </div>
+
+                    <div class="flex space-x-3">
+                        <button onclick="updateUser()"
+                            class="flex-1 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            Update
+                        </button>
+                        <button onclick="hideEditModal()"
+                            class="flex-1 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-modal"
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+                <h3 class="text-xl font-semibold text-white mb-4">Confirm Deletion</h3>
+                <p class="text-gray-300 mb-6">Are you sure you want to delete user <span id="delete-username"
+                        class="font-bold"></span>?</p>
+                <div class="flex space-x-3">
+                    <button onclick="deleteUser()"
+                        class="flex-1 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                        Delete
+                    </button>
+                    <button onclick="hideDeleteModal()"
+                        class="flex-1 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <script>
+            function stopUserBot(username) {
+                if (!confirm(`Are you sure you want to stop ${username}'s bot?`)) {
+                    return;
+                }
+
+                fetch('/admin/stop_bot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showNotification(`Bot for ${username} stopped successfully`, 'success');
+                            window.location.reload();
+                        } else {
+                            showNotification('Error: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred while stopping the bot', 'error');
+                    });
+            }
+
+            function toggleUserActive(username, shouldActivate) {
+                fetch('/admin/toggle_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        active: shouldActivate
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Success - reload the page to reflect changes
+                            window.location.reload();
+                        } else {
+                            showNotification('Error: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred', 'error');
+                    });
+            }
+        </script>
+        <script>
+            // Create new user
+            function createUser() {
+                const username = document.getElementById('new-username').value;
+                const password = document.getElementById('new-password').value;
+                const expiryDays = parseInt(document.getElementById('new-expiry-days').value);
+                const isAdmin = {% if is_owner %} document.getElementById('new-is-admin').checked{% else %} false{% endif %};
+
+            if (!username || !password) {
+                showNotification('Username and password are required', 'info');
+                return;
+            }
+
+            if (isNaN(expiryDays)) {
+                showNotification('Please enter a valid number for expiration days', 'warning');
+                return;
+            }
+
+            fetch('/admin/create_user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    expire_days: expiryDays,
+                    is_admin: isAdmin
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showNotification('User created successfully', 'success');
+                        window.location.reload();
+                    } else {
+                        showNotification('Error: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('An error occurred', 'error');
+                });
+            }
+
+            // Edit user functions
+            function showEditModal(username, currentExpiry, isTargetAdmin, isCurrentOwner) {
+                document.getElementById('edit-username').value = username;
+                document.getElementById('edit-expiry').value = currentExpiry;
+
+                // Hide expiry field if editing another admin (and not owner)
+                if (!isCurrentOwner && isTargetAdmin) {
+                    document.getElementById('expiry-field-container').classList.add('hidden');
+                } else {
+                    document.getElementById('expiry-field-container').classList.remove('hidden');
+                }
+
+                document.getElementById('edit-modal').classList.remove('hidden');
+            }
+            function hideEditModal() {
+                document.getElementById('edit-modal').classList.add('hidden');
+            }
+
+            function updateUser() {
+                const username = document.getElementById('edit-username').value;
+                const newExpiry = document.getElementById('edit-expiry').value;
+                const newPassword = document.getElementById('edit-password').value;
+
+                // Check if expiry field is hidden (editing admin as non-owner)
+                const expiryFieldHidden = document.getElementById('expiry-field-container').classList.contains('hidden');
+
+                if (expiryFieldHidden && newExpiry) {
+                    showNotification('Only owner can modify admin expiry dates', 'error');
+                    return;
+                }
+
+                // Prepare data to send
+                const data = {
+                    username: username
+                };
+
+                if (!expiryFieldHidden && newExpiry) {
+                    data.new_expiry = newExpiry;
+                }
+
+                if (newPassword) {
+                    data.new_password = newPassword;
+                }
+
+                // Send the update request
+                fetch('/admin/update_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showNotification('User updated successfully', 'success');
+                            window.location.reload();
+                        } else {
+                            showNotification('Error: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred', 'error');
+                    });
+            }
+
+            function promoteAdmin(username) {
+                if (!confirm(`Are you sure you want to make ${username} an admin?`)) {
+                    return;
+                }
+
+                fetch('/admin/promote_admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showNotification(`${username} is now an admin`, 'success');
+                            window.location.reload();
+                        } else {
+                            showNotification('Error: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred', 'error');
+                    });
+            }
+
+            function demoteAdmin(username) {
+                if (!confirm(`Are you sure you want to remove admin privileges from ${username}?`)) {
+                    return;
+                }
+
+                fetch('/admin/demote_admin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showNotification(`${username} is no longer an admin`, 'success');
+                            window.location.reload();
+                        } else {
+                            showNotification('Error: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred', 'error');
+                    });
+            }
+
+            // Delete user functions
+            function confirmDelete(username) {
+                document.getElementById('delete-username').textContent = username;
+                document.getElementById('delete-modal').classList.remove('hidden');
+            }
+
+            function hideDeleteModal() {
+                document.getElementById('delete-modal').classList.add('hidden');
+            }
+
+            function deleteUser() {
+                const username = document.getElementById('delete-username').textContent;
+
+                fetch('/admin/delete_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showNotification('User deleted successfully', 'success');
+                            window.location.reload();
+                        } else {
+                            showNotification('Error: ' + data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('An error occurred', 'error');
+                    });
+            }
+        </script>
+        <script>
+            function showNotification(message, type = 'info', duration = 5000) {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+
+                const icons = {
+                    success: 'fas fa-check-circle',
+                    error: 'fas fa-exclamation-circle',
+                    warning: 'fas fa-exclamation-triangle',
+                    info: 'fas fa-info-circle'
+                };
+
+                notification.innerHTML = `
+                <i class="notification-icon ${icons[type] || icons.info}"></i>
+                <span>${message}</span>
+                <span class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </span>
+            `;
+
+                container.appendChild(notification);
+
+                if (duration > 0) {
+                    setTimeout(() => {
+                        notification.style.animation = 'fadeOut 0.3s ease-out forwards';
+                        setTimeout(() => notification.remove(), 300);
+                    }, duration);
+                }
+
+                return notification;
+            }
+        </script>
+        <script>
+            // Proxy management functions
+            function refreshProxyStats() {
+                fetch('/admin/proxy_stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.getElementById('proxy-total').textContent = data.stats.total;
+                            document.getElementById('proxy-available').textContent = data.stats.available;
+                            document.getElementById('proxy-in-use').textContent = data.stats.in_use;
+                        }
+                    });
+
+                loadProxyList();
+            }
+
+            function loadProxyList() {
+                fetch('/admin/proxies')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const proxyList = document.getElementById('proxy-list');
+                            proxyList.innerHTML = '';
+
+                            data.proxies.forEach(proxy => {
+                                const row = document.createElement('tr');
+                                row.className = 'hover:bg-gray-600';
+
+                                const statusBadge = proxy.in_use
+                                    ? `<span class="badge badge-warning">In Use (${proxy.used_by || 'unknown'})</span>`
+                                    : '<span class="badge badge-success">Available</span>';
+
+                                row.innerHTML = `
+                            <td class="px-2 py-1 text-sm text-gray-300">
+                                ${proxy.host}:${proxy.port}
+                                ${proxy.username ? `<div class="text-xs text-gray-400">${proxy.username}</div>` : ''}
+                            </td>
+                            <td class="px-2 py-1 text-sm">
+                                ${statusBadge}
+                            </td>
+                            <td class="px-2 py-1 text-sm">
+                                <button onclick="removeProxy('${proxy.host}', ${proxy.port})" 
+                                    class="text-red-400 hover:text-red-300 mr-2" title="Remove">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button onclick="testProxy('${proxy.host}', ${proxy.port})" 
+                                    class="text-blue-400 hover:text-blue-300" title="Test">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </td>
+                        `;
+
+                                proxyList.appendChild(row);
+                            });
+                        }
+                    });
+            }
+
+            function addProxy() {
+                const host = document.getElementById('proxy-host').value;
+                const port = document.getElementById('proxy-port').value;
+                const username = document.getElementById('proxy-username').value;
+                const password = document.getElementById('proxy-password').value;
+
+                if (!host || !port) {
+                    showNotification('Host and port are required', 'error');
+                    return;
+                }
+
+                fetch('/admin/proxies', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'add',
+                        host: host,
+                        port: parseInt(port),
+                        username: username,
+                        password: password
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showNotification('Proxy added successfully', 'success');
+                            document.getElementById('proxy-host').value = '';
+                            document.getElementById('proxy-port').value = '';
+                            document.getElementById('proxy-username').value = '';
+                            document.getElementById('proxy-password').value = '';
+                            refreshProxyStats();
+                        } else {
+                            showNotification('Error: ' + data.message, 'error');
+                        }
+                    });
+            }
+
+            function removeProxy(host, port) {
+                if (!confirm(`Are you sure you want to remove proxy ${host}:${port}?`)) {
+                    return;
+                }
+
+                fetch('/admin/proxies', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'remove',
+                        host: host,
+                        port: port
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showNotification('Proxy removed successfully', 'success');
+                            refreshProxyStats();
+                        } else {
+                            showNotification('Error: ' + data.message, 'error');
+                        }
+                    });
+            }
+
+            function testProxy(host, port) {
+                showNotification('Proxy testing not implemented yet', 'info');
+            }
+
+            // Load proxy stats when page loads
+            document.addEventListener('DOMContentLoaded', refreshProxyStats);
+        </script>
+    </body>
+
+</html>
